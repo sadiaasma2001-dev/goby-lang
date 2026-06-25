@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐟 Goby Lang Web IDE</title>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #58a6ff;
+            text-align: center;
+        }
+        textarea {
+            width: 100%;
+            height: 250px;
+            background-color: #161b22;
+            color: #7ee787;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 15px;
+            font-size: 16px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        button {
+            background-color: #238636;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            transition: 0.2s;
+        }
+        button:hover {
+            background-color: #2ea44f;
+        }
+        .output-box {
+            background-color: #010409;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 20px;
+            min-height: 100px;
+            white-space: pre-wrap;
+            color: #ff7b72;
+        }
+        .success {
+            color: #58a6ff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🐟 Goby Lang Online Web IDE</h1>
+    <p style="text-align: center; color: #8b949e;">Write Goby Lang code and run it instantly in the browser!</p>
+
+    <!-- Code Editor Box -->
+    <textarea id="gobyCode">
+goby_shuru
+shrimp_rakho level = 5
+shrimp_rakho oxygen = 98
+goby_bolo "--- Welcome to Goby Lang Web ---"
+goby_bolo level
+goby_bolo oxygen
+goby_shesh
+    </textarea>
+
+    <button onclick="runGobyEngine()">Run Code 🚀</button>
+
+    <h3>Console Output:</h3>
+    <div id="output" class="output-box">Output will appear here...</div>
+</div>
+
+<script>
+function runGobyEngine() {
+    const code = document.getElementById("gobyCode").value;
+    const outputDiv = document.getElementById("output");
+    outputDiv.innerHTML = ""; // Clear old output
+    
+    let variables = {};
+    let outputBuffer = "";
+
+    // Split code by lines
+    const lines = code.split('\n').map(line => line.trim());
+
+    for (let line of lines) {
+        if (!line || line === "goby_shuru" || line === "goby_shesh") continue;
+
+        // 1. Variable Statement: shrimp_rakho var = value
+        if (line.startsWith("shrimp_rakho")) {
+            let match = line.match(/shrimp_rakho\s+(\w+)\s*=\s*(.+)/);
+            if (match) {
+                let varName = match[1];
+                let varValue = match[2].trim();
+                variables[varName] = parseInt(varValue) || 0;
+            } else {
+                outputBuffer += `⚠️ Syntax Error in declaration: ${line}\n`;
+            }
+        } 
+        // 2. Print Statement: goby_bolo "string" or var
+        else if (line.startsWith("goby_bolo")) {
+            let match = line.match(/goby_bolo\s+(.+)/);
+            if (match) {
+                let target = match[1].trim();
+
+                // If it's a raw string inside quotes
+                if (target.startsWith('"') && target.endsWith('"')) {
+                    outputBuffer += target.slice(1, -1) + "\n";
+                } 
+                // If it's a variable
+                else if (variables[target] !== undefined) {
+                    outputBuffer += variables[target] + "\n";
+                } else {
+                    outputBuffer += `❌ Error: '${target}' definition not found!\n`;
+                }
+            }
+        } else {
+            outputBuffer += `⚠️ Unknown statement: ${line}\n`;
+        }
+    }
+
+    // Render result to UI
+    outputDiv.innerText = outputBuffer || "Code executed successfully with no output.";
+}
+</script>
+
+</body>
+</html>
